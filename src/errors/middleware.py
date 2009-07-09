@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# vim set:ts=2 sw=2 et:
+# vim:set ts=2 sw=2 et:
 #
 # Google App Engine Internal Error Middleware
 # Copyright (C) 2009 Wesley Tanaka <http://wtanaka.com>
