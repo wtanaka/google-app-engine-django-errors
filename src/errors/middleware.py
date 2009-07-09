@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 import django.http
 
 from google.appengine.api.datastore_errors import InternalError
@@ -42,5 +44,6 @@ class GoogleAppEngineErrorMiddleware:
   def process_exception(self, request, exception):
     for e_type, template_name in CATCHABLE:
       if isinstance(exception, e_type):
+        logging.exception("Exception in request (handled by GoogleAppEngineErrorMiddleware):")
         html = render(template_name, {'exception': exception})
         return django.http.HttpResponseServerError(html)
