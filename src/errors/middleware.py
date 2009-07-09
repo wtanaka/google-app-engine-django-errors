@@ -24,6 +24,13 @@ from google.appengine.api.datastore_errors import Timeout
 from google.appengine.api.datastore_errors import TransactionFailedError
 from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 
+CATCHABLE = (
+ (Timeout, 'timeout.html'),
+ (InternalError, 'internal-error.html'),
+ (CapabilityDisabledError, 'capability-disabled.html'),
+ (TransactionFailedError, 'transaction-failed.html'),
+)
+
 def render(template, template_values):
   import django.template.loader
   t = django.template.loader.get_template(template)
@@ -33,23 +40,7 @@ def render(template, template_values):
 class GoogleAppEngineErrorMiddleware:
   """Display a default template on internal google app engine errors"""
   def process_exception(self, request, exception):
-    try:
-      raise exception
-    except CapabilityDisabledError:
-      return django.http.HttpResponseServerError(render(
-            'capability-disabled.html',
-            {'exception': exception}))
-    except InternalError:
-      return django.http.HttpResponseServerError(render(
-            'internal-error.html',
-            {'exception': exception}))
-    except Timeout:
-      return django.http.HttpResponseServerError(render(
-            'timeout.html',
-            {'exception': exception}))
-    except TransactionFailedError:
-      return django.http.HttpResponseServerError(render(
-            'transaction-failed.html',
-            {'exception': exception}))
-    except:
-      pass
+    for e_type, template_name in CATCHABLE:
+      if isinstance(exception, e_type):
+        html = render(template_name, {'exception': exception})
+        return django.http.HttpResponseServerError(html)
