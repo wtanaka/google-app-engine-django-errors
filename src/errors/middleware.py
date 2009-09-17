@@ -29,16 +29,16 @@ import google.appengine.api.labs.taskqueue
 import google.appengine.runtime
 
 CATCHABLE = (
- (Timeout, 'timeout.html'),
- (InternalError, 'internal-error.html'),
+ (Timeout, 'timeout.html', 503),
+ (InternalError, 'internal-error.html', 500),
  (google.appengine.api.labs.taskqueue.TransientError,
-  'transient-error.html'),
- (CapabilityDisabledError, 'capability-disabled.html'),
+  'transient-error.html', 503),
+ (CapabilityDisabledError, 'capability-disabled.html', 503),
  (google.appengine.runtime.DeadlineExceededError,
-  'deadline-exceeded.html'),
+  'deadline-exceeded.html', 503),
  (google.appengine.api.labs.taskqueue.InternalError,
-  'taskqueue-internal-error.html'),
- (TransactionFailedError, 'transaction-failed.html'),
+  'taskqueue-internal-error.html', 500),
+ (TransactionFailedError, 'transaction-failed.html', 503),
 )
 
 def render(template, template_values):
@@ -50,8 +50,10 @@ def render(template, template_values):
 class GoogleAppEngineErrorMiddleware:
   """Display a default template on internal google app engine errors"""
   def process_exception(self, request, exception):
-    for e_type, template_name in CATCHABLE:
+    for e_type, template_name, status in CATCHABLE:
       if isinstance(exception, e_type):
         logging.exception("Exception in request (handled by GoogleAppEngineErrorMiddleware):")
         html = render(template_name, {'exception': exception})
-        return django.http.HttpResponseServerError(html)
+        response = django.http.HttpResponseServerError(html)
+        response.status_code = status
+        return response
