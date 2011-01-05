@@ -25,18 +25,18 @@ from google.appengine.api.datastore_errors import InternalError
 from google.appengine.api.datastore_errors import Timeout
 from google.appengine.api.datastore_errors import TransactionFailedError
 from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
-import google.appengine.api.labs.taskqueue
+import google.appengine.api.taskqueue
 import google.appengine.runtime
 
 CATCHABLE = (
  (Timeout, 'timeout.html', 503),
  (InternalError, 'internal-error.html', 500),
- (google.appengine.api.labs.taskqueue.TransientError,
+ (google.appengine.api.taskqueue.TransientError,
   'transient-error.html', 503),
  (CapabilityDisabledError, 'capability-disabled.html', 503),
  (google.appengine.runtime.DeadlineExceededError,
   'deadline-exceeded.html', 503),
- (google.appengine.api.labs.taskqueue.InternalError,
+ (google.appengine.api.taskqueue.InternalError,
   'taskqueue-internal-error.html', 500),
  (TransactionFailedError, 'transaction-failed.html', 503),
 )
